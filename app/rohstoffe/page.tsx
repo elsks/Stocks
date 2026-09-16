@@ -4,8 +4,6 @@ import { COMMODITY_WATCHLIST } from "@/lib/watchlists";
 import { StatusBadge } from "@/components/status-badge";
 import { Watchlist } from "@/components/watchlist";
 
-export const dynamic = "force-dynamic";
-
 export default async function RohstoffePage() {
   const section = navSections.find((s) => s.href === "/rohstoffe")!;
   const entries = await getQuotesResult(COMMODITY_WATCHLIST);

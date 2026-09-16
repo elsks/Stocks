@@ -4,8 +4,6 @@ import { STOCK_WATCHLIST } from "@/lib/watchlists";
 import { StatusBadge } from "@/components/status-badge";
 import { Watchlist } from "@/components/watchlist";
 
-export const dynamic = "force-dynamic";
-
 export default async function AktienPage() {
   const section = navSections.find((s) => s.href === "/aktien")!;
   const entries = await getQuotesResult(STOCK_WATCHLIST);
