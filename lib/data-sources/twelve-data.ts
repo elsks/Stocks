@@ -1,5 +1,9 @@
 const BASE_URL = "https://api.twelvedata.com/quote";
-const REVALIDATE_SECONDS = 60;
+// Der kostenlose Twelve-Data-Tarif erlaubt nur 8 Anfragen/Minute; bei 11
+// Watchlist-Symbolen reicht ein einziger Seitenaufruf, um das Limit
+// auszuschoepfen. 5 Minuten Cache vermeiden das und passen zum
+// langfristigen Anlagehorizont dieser Plattform.
+const REVALIDATE_SECONDS = 5 * 60;
 
 export interface Quote {
   symbol: string;
