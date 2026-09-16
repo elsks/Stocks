@@ -104,12 +104,14 @@ function toPercent(ratio: number | null): number | null {
 export async function getCompanyFundamentals(
   symbol: string,
 ): Promise<CompanyFundamentals> {
-  const [profileRaw, ratiosRaw, keyMetricsRaw, balanceSheetRaw] = await Promise.all([
-    fetchFmp("profile", symbol),
-    fetchFmp("ratios-ttm", symbol),
-    fetchFmp("key-metrics-ttm", symbol),
-    fetchFmp("balance-sheet-statement", symbol),
-  ]);
+  const [profileRaw, ratiosRaw, keyMetricsRaw, balanceSheetRaw, incomeStatementRaw] =
+    await Promise.all([
+      fetchFmp("profile", symbol),
+      fetchFmp("ratios-ttm", symbol),
+      fetchFmp("key-metrics-ttm", symbol),
+      fetchFmp("balance-sheet-statement", symbol),
+      fetchFmp("income-statement", symbol),
+    ]);
 
   const totalEquity = pickNumber(balanceSheetRaw, [
     "totalStockholdersEquity",
@@ -141,6 +143,16 @@ export async function getCompanyFundamentals(
   const computedFcfMargin =
     freeCashFlowPerShare !== null && revenuePerShare
       ? freeCashFlowPerShare / revenuePerShare
+      : null;
+
+  const operatingIncome = pickNumber(incomeStatementRaw, [
+    "operatingIncome",
+    "ebit",
+  ]);
+  const interestExpense = pickNumber(incomeStatementRaw, ["interestExpense"]);
+  const computedInterestCoverage =
+    operatingIncome !== null && interestExpense
+      ? operatingIncome / Math.abs(interestExpense)
       : null;
 
   const metrics: FundamentalMetrics = {
@@ -199,11 +211,7 @@ export async function getCompanyFundamentals(
       "netDebtToEBITDATTM",
       "netDebtToEbitdaTTM",
     ]),
-    interestCoverage: pickNumber(combined, [
-      "interestCoverageTTM",
-      "interestCoverageRatioTTM",
-      "ebitToInterestExpenseTTM",
-    ]),
+    interestCoverage: computedInterestCoverage,
   };
 
   return { symbol, profile, metrics };
