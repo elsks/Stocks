@@ -128,55 +128,82 @@ export async function getCompanyFundamentals(
     currency: pickString(profileRaw, ["currency"]) ?? "USD",
   };
 
+  const combined = { ...ratiosRaw, ...keyMetricsRaw };
+
+  const freeCashFlowPerShare = pickNumber(combined, [
+    "freeCashFlowPerShareTTM",
+    "freeCashFlowPerShare",
+  ]);
+  const revenuePerShare = pickNumber(combined, [
+    "revenuePerShareTTM",
+    "revenuePerShare",
+  ]);
+  const computedFcfMargin =
+    freeCashFlowPerShare !== null && revenuePerShare
+      ? freeCashFlowPerShare / revenuePerShare
+      : null;
+
   const metrics: FundamentalMetrics = {
-    peRatio: pickNumber(ratiosRaw, [
+    peRatio: pickNumber(combined, [
       "priceToEarningsRatioTTM",
       "peRatioTTM",
       "priceEarningsRatioTTM",
     ]),
-    priceToSales: pickNumber(ratiosRaw, [
+    priceToSales: pickNumber(combined, [
       "priceToSalesRatioTTM",
       "priceSalesRatioTTM",
     ]),
-    priceToFreeCashFlow: pickNumber(ratiosRaw, [
+    priceToFreeCashFlow: pickNumber(combined, [
       "priceToFreeCashFlowRatioTTM",
       "priceToFreeCashFlowsRatioTTM",
       "pfcfRatioTTM",
     ]),
-    evToEbitda: pickNumber(keyMetricsRaw, [
+    evToEbitda: pickNumber(combined, [
       "evToEBITDATTM",
       "enterpriseValueOverEBITDATTM",
+      "evToOperatingCashFlowTTM",
     ]),
-    priceToBook: pickNumber(ratiosRaw, ["priceToBookRatioTTM", "pbRatioTTM"]),
+    priceToBook: pickNumber(combined, ["priceToBookRatioTTM", "pbRatioTTM"]),
     dividendYieldPercent: toPercent(
-      pickNumber(ratiosRaw, ["dividendYieldTTM", "dividendYielPercentageTTM"]),
+      pickNumber(combined, ["dividendYieldTTM", "dividendYielPercentageTTM"]),
     ),
     roicPercent: toPercent(
-      pickNumber(keyMetricsRaw, ["returnOnInvestedCapitalTTM", "roicTTM"]),
+      pickNumber(combined, ["returnOnInvestedCapitalTTM", "roicTTM"]),
     ),
     roePercent: toPercent(
-      pickNumber(ratiosRaw, ["returnOnEquityTTM", "roeTTM"]),
+      pickNumber(combined, [
+        "returnOnEquityTTM",
+        "roeTTM",
+        "returnOnEquity",
+      ]),
     ),
     fcfMarginPercent: toPercent(
-      pickNumber(ratiosRaw, ["freeCashFlowMarginTTM"]) ??
-        pickNumber(keyMetricsRaw, ["freeCashFlowMarginTTM"]),
+      pickNumber(combined, [
+        "freeCashFlowMarginTTM",
+        "freeCashFlowToRevenueTTM",
+        "fcfMarginTTM",
+      ]) ?? computedFcfMargin,
     ),
     netMarginPercent: toPercent(
-      pickNumber(ratiosRaw, ["netProfitMarginTTM"]),
+      pickNumber(combined, ["netProfitMarginTTM"]),
     ),
     grossMarginPercent: toPercent(
-      pickNumber(ratiosRaw, ["grossProfitMarginTTM"]),
+      pickNumber(combined, ["grossProfitMarginTTM"]),
     ),
     equityRatioPercent,
-    debtToEquity: pickNumber(ratiosRaw, [
+    debtToEquity: pickNumber(combined, [
       "debtToEquityRatioTTM",
       "debtEquityRatioTTM",
     ]),
-    netDebtToEbitda: pickNumber(keyMetricsRaw, [
+    netDebtToEbitda: pickNumber(combined, [
       "netDebtToEBITDATTM",
       "netDebtToEbitdaTTM",
     ]),
-    interestCoverage: pickNumber(ratiosRaw, ["interestCoverageTTM"]),
+    interestCoverage: pickNumber(combined, [
+      "interestCoverageTTM",
+      "interestCoverageRatioTTM",
+      "ebitToInterestExpenseTTM",
+    ]),
   };
 
   return { symbol, profile, metrics };
