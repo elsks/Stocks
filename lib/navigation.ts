@@ -41,8 +41,8 @@ export const navSections: NavSection[] = [
     href: "/news",
     label: "News",
     summary: "Finanznachrichten mit Quellenangabe und Zusammenfassung.",
-    status: "planned",
-    note: "Folgt, sobald eine Nachrichten-Quelle angebunden ist.",
+    status: "live",
+    note: "US-Wirtschaftsdaten sind live, geopolitische News folgen als Nächstes.",
   },
   {
     href: "/chancen-risiken",
