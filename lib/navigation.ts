@@ -1,4 +1,4 @@
-export type SectionStatus = "next" | "planned" | "waiting-for-input";
+export type SectionStatus = "live" | "next" | "planned" | "waiting-for-input";
 
 export interface NavSection {
   href: string;
@@ -13,15 +13,15 @@ export const navSections: NavSection[] = [
     href: "/aktien",
     label: "Aktien",
     summary: "Watchlist und Kurse einzelner Unternehmen.",
-    status: "next",
-    note: "Zeigt Kurse, sobald die Anbindung an Twelve Data steht (Phase 3).",
+    status: "live",
+    note: "Zeigt aktuell einen Beispielkurs &ndash; die echte Watchlist folgt später.",
   },
   {
     href: "/rohstoffe",
     label: "Gold & Rohstoffe",
     summary: "Kurse für Gold, Silber und weitere Rohstoffe.",
-    status: "next",
-    note: "Zeigt Kurse, sobald die Anbindung an Twelve Data steht (Phase 3).",
+    status: "live",
+    note: "Zeigt aktuell den Goldpreis &ndash; weitere Rohstoffe folgen später.",
   },
   {
     href: "/unternehmen",

@@ -1,12 +1,14 @@
 import type { SectionStatus } from "@/lib/navigation";
 
 const labels: Record<SectionStatus, string> = {
+  live: "Live-Daten",
   next: "Als Nächstes",
   planned: "Geplant",
   "waiting-for-input": "Wartet auf dich",
 };
 
 const styles: Record<SectionStatus, string> = {
+  live: "bg-accent text-accent-foreground",
   next: "bg-accent-soft text-accent",
   planned: "bg-background text-muted-foreground border border-border",
   "waiting-for-input":
