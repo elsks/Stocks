@@ -1,16 +1,14 @@
 import { navSections } from "@/lib/navigation";
-import { getQuoteResult } from "@/lib/data-sources/twelve-data";
+import { getQuotesResult } from "@/lib/data-sources/twelve-data";
+import { COMMODITY_WATCHLIST } from "@/lib/watchlists";
 import { StatusBadge } from "@/components/status-badge";
-import { QuoteCard } from "@/components/quote-card";
-import { DataError } from "@/components/data-error";
-
-const DEMO_SYMBOL = "XAU/USD";
+import { Watchlist } from "@/components/watchlist";
 
 export const dynamic = "force-dynamic";
 
 export default async function RohstoffePage() {
   const section = navSections.find((s) => s.href === "/rohstoffe")!;
-  const result = await getQuoteResult(DEMO_SYMBOL);
+  const entries = await getQuotesResult(COMMODITY_WATCHLIST);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
@@ -21,14 +19,9 @@ export default async function RohstoffePage() {
         <StatusBadge status={section.status} />
       </div>
       <p className="text-muted-foreground">
-        Beispielhaft der Goldpreis ({DEMO_SYMBOL}) &ndash; weitere
-        Rohstoffe folgen in einem späteren Schritt.
+        Gold, Rohöl (WTI) und Silber.
       </p>
-      {"quote" in result ? (
-        <QuoteCard quote={result.quote} />
-      ) : (
-        <DataError message={result.error} />
-      )}
+      <Watchlist entries={entries} />
     </div>
   );
 }

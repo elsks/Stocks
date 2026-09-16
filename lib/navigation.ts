@@ -14,14 +14,14 @@ export const navSections: NavSection[] = [
     label: "Aktien",
     summary: "Watchlist und Kurse einzelner Unternehmen.",
     status: "live",
-    note: "Zeigt aktuell einen Beispielkurs &ndash; die echte Watchlist folgt später.",
+    note: "Deine echte Watchlist mit mehreren Aktien.",
   },
   {
     href: "/rohstoffe",
     label: "Gold & Rohstoffe",
     summary: "Kurse für Gold, Silber und weitere Rohstoffe.",
     status: "live",
-    note: "Zeigt aktuell den Goldpreis &ndash; weitere Rohstoffe folgen später.",
+    note: "Gold, Rohöl (WTI) und Silber.",
   },
   {
     href: "/unternehmen",
