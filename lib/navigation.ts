@@ -27,8 +27,8 @@ export const navSections: NavSection[] = [
     href: "/unternehmen",
     label: "Unternehmensanalyse",
     summary: "Fundamentaldaten und Geschäftsmodell je Unternehmen.",
-    status: "planned",
-    note: "Folgt, sobald Fundamentaldaten angebunden sind (Phase 4).",
+    status: "live",
+    note: "Zeigt Kennzahlen gegen deine eigenen Zielwerte für ein Beispielunternehmen.",
   },
   {
     href: "/technische-analyse",
