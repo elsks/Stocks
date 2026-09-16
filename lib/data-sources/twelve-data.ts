@@ -35,15 +35,32 @@ export async function getQuote(symbol: string): Promise<Quote> {
     );
   }
 
+  const price = Number(data.close);
+  if (!Number.isFinite(price)) {
+    throw new MarketDataError(
+      "Twelve Data hat keinen gültigen Kurs für dieses Symbol geliefert.",
+    );
+  }
+
+  const currency =
+    typeof data.currency === "string" && /^[A-Z]{3}$/.test(data.currency)
+      ? data.currency
+      : "USD";
+
+  const timestampMs = Number(data.timestamp) * 1000;
+  const asOf = Number.isFinite(timestampMs)
+    ? new Date(timestampMs).toISOString()
+    : new Date().toISOString();
+
   return {
-    symbol: data.symbol,
-    name: data.name,
-    price: Number(data.close),
-    change: Number(data.change),
-    changePercent: Number(data.percent_change),
-    currency: data.currency,
-    exchange: data.exchange,
-    asOf: new Date(Number(data.timestamp) * 1000).toISOString(),
+    symbol: data.symbol ?? symbol,
+    name: data.name ?? data.symbol ?? symbol,
+    price,
+    change: Number(data.change) || 0,
+    changePercent: Number(data.percent_change) || 0,
+    currency,
+    exchange: data.exchange ?? "-",
+    asOf,
     isMarketOpen: data.is_market_open === true,
   };
 }
