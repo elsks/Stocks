@@ -133,6 +133,7 @@ export const criteria: Criterion[] = [
     group: "Bilanz & Risiko",
     unit: "ratio",
     target: "≥ 5x",
+    note: "Für manche Unternehmen liefert die Datenquelle hierzu aktuell keinen brauchbaren Zinsaufwand.",
     evaluate: (v) => v >= 5,
   },
 ];
