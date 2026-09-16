@@ -1,12 +1,17 @@
 import { navSections } from "@/lib/navigation";
 import { getUsEconomicEventsResult } from "@/lib/data-sources/economic-calendar";
+import { getGeopoliticalNewsResult } from "@/lib/data-sources/geopolitical-news";
 import { StatusBadge } from "@/components/status-badge";
 import { EconomicEventList } from "@/components/economic-event-list";
+import { NewsArticleList } from "@/components/news-article-list";
 import { DataError } from "@/components/data-error";
 
 export default async function NewsPage() {
   const section = navSections.find((s) => s.href === "/news")!;
-  const result = await getUsEconomicEventsResult();
+  const [calendarResult, newsResult] = await Promise.all([
+    getUsEconomicEventsResult(),
+    getGeopoliticalNewsResult(),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
@@ -27,10 +32,10 @@ export default async function NewsPage() {
             aktualisiert.
           </p>
         </div>
-        {"events" in result ? (
-          <EconomicEventList events={result.events} />
+        {"events" in calendarResult ? (
+          <EconomicEventList events={calendarResult.events} />
         ) : (
-          <DataError message={result.error} />
+          <DataError message={calendarResult.error} />
         )}
       </section>
 
@@ -38,13 +43,16 @@ export default async function NewsPage() {
         <div>
           <h2 className="font-medium">Geopolitische News</h2>
           <p className="text-sm text-muted-foreground">
-            Folgt im nächsten Schritt, sobald eine geeignete Nachrichten-Quelle
-            ausgewählt ist.
+            Weltweite Ereignisse mit möglicher Marktrelevanz (Sanktionen,
+            Handelskonflikte, Wahlen, Notenbanken, ...). Quelle: GNews,
+            stündlich aktualisiert, Artikel auf Englisch.
           </p>
         </div>
-        <div className="rounded-xl border border-dashed border-border bg-surface px-6 py-8 text-center text-sm text-muted-foreground">
-          Noch keine Quelle angebunden.
-        </div>
+        {"articles" in newsResult ? (
+          <NewsArticleList articles={newsResult.articles} />
+        ) : (
+          <DataError message={newsResult.error} />
+        )}
       </section>
     </div>
   );

@@ -42,7 +42,7 @@ export const navSections: NavSection[] = [
     label: "News",
     summary: "Finanznachrichten mit Quellenangabe und Zusammenfassung.",
     status: "live",
-    note: "US-Wirtschaftsdaten sind live, geopolitische News folgen als Nächstes.",
+    note: "US-Wirtschaftsdaten und geopolitische News sind live.",
   },
   {
     href: "/chancen-risiken",
