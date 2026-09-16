@@ -13,9 +13,16 @@ function apiKey(): string {
   return key;
 }
 
-async function fetchFmp(path: string, symbol: string): Promise<Record<string, unknown>> {
+async function fetchFmp(
+  path: string,
+  symbol: string,
+  extraParams: Record<string, string> = {},
+): Promise<Record<string, unknown>> {
   const url = new URL(`${BASE_URL}/${path}`);
   url.searchParams.set("symbol", symbol);
+  for (const [key, value] of Object.entries(extraParams)) {
+    url.searchParams.set(key, value);
+  }
   url.searchParams.set("apikey", apiKey());
 
   const response = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
@@ -109,8 +116,8 @@ export async function getCompanyFundamentals(
       fetchFmp("profile", symbol),
       fetchFmp("ratios-ttm", symbol),
       fetchFmp("key-metrics-ttm", symbol),
-      fetchFmp("balance-sheet-statement", symbol),
-      fetchFmp("income-statement", symbol),
+      fetchFmp("balance-sheet-statement", symbol, { period: "annual", limit: "1" }),
+      fetchFmp("income-statement", symbol, { period: "annual", limit: "1" }),
     ]);
 
   const totalEquity = pickNumber(balanceSheetRaw, [
@@ -149,7 +156,11 @@ export async function getCompanyFundamentals(
     "operatingIncome",
     "ebit",
   ]);
-  const interestExpense = pickNumber(incomeStatementRaw, ["interestExpense"]);
+  const interestExpense = pickNumber(incomeStatementRaw, [
+    "interestExpense",
+    "totalInterestExpense",
+    "netInterestIncome",
+  ]);
   const computedInterestCoverage =
     operatingIncome !== null && interestExpense
       ? operatingIncome / Math.abs(interestExpense)
