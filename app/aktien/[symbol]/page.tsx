@@ -3,15 +3,15 @@ import { notFound } from "next/navigation";
 import { getQuoteResult } from "@/lib/data-sources/twelve-data";
 import {
   getCompanyFundamentalsResult,
-  getCompanyNewsResult,
   getPriceTargetResult,
 } from "@/lib/data-sources/fmp";
+import { getCompanyNewsResult } from "@/lib/data-sources/gnews";
 import { evaluateCriteria } from "@/lib/analysis/valuation-criteria";
 import { STOCK_WATCHLIST } from "@/lib/watchlists";
 import { DataError } from "@/components/data-error";
 import { CriteriaGroup, CriteriaSummary } from "@/components/criteria-list";
 import { PriceTargetCard } from "@/components/price-target-card";
-import { CompanyNewsList } from "@/components/company-news-list";
+import { NewsArticleList } from "@/components/news-article-list";
 
 export async function generateStaticParams() {
   return STOCK_WATCHLIST.map((symbol) => ({ symbol }));
@@ -29,18 +29,17 @@ export default async function StockPage({
     notFound();
   }
 
-  const [quoteResult, fundamentalsResult, newsResult, priceTargetResult] =
-    await Promise.all([
-      getQuoteResult(symbol),
-      getCompanyFundamentalsResult(symbol),
-      getCompanyNewsResult(symbol),
-      getPriceTargetResult(symbol),
-    ]);
-
+  const fundamentalsResult = await getCompanyFundamentalsResult(symbol);
   const companyName =
     "fundamentals" in fundamentalsResult
       ? fundamentalsResult.fundamentals.profile.name
       : symbol;
+
+  const [quoteResult, newsResult, priceTargetResult] = await Promise.all([
+    getQuoteResult(symbol),
+    getCompanyNewsResult(symbol, companyName),
+    getPriceTargetResult(symbol),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
@@ -142,18 +141,18 @@ export default async function StockPage({
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Unternehmens-News</h2>
         {"articles" in newsResult ? (
-          <CompanyNewsList articles={newsResult.articles} />
+          <NewsArticleList articles={newsResult.articles} />
         ) : (
           <DataError message={newsResult.error} />
         )}
       </section>
 
       <p className="text-xs text-muted-foreground">
-        Kurs: Twelve Data. Fundamentaldaten, Kursziele und News: Financial
-        Modeling Prep (End-of-Day-Daten, stündlich aktualisiert). Zielwerte
-        für die Fundamentaldaten stammen aus deinem eigenen Kriterienkatalog.
-        Kursziele und News sind Einschätzungen bzw. Berichte Dritter, keine
-        eigene Bewertung durch diese Plattform.
+        Kurs: Twelve Data. Fundamentaldaten und Kursziele: Financial Modeling
+        Prep (End-of-Day-Daten, stündlich aktualisiert). News: GNews, Artikel
+        auf Englisch. Zielwerte für die Fundamentaldaten stammen aus deinem
+        eigenen Kriterienkatalog. Kursziele und News sind Einschätzungen bzw.
+        Berichte Dritter, keine eigene Bewertung durch diese Plattform.
       </p>
     </div>
   );

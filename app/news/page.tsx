@@ -1,6 +1,6 @@
 import { navSections } from "@/lib/navigation";
 import { getUsEconomicEventsResult } from "@/lib/data-sources/economic-calendar";
-import { getGeopoliticalNewsResult } from "@/lib/data-sources/geopolitical-news";
+import { getGeopoliticalNewsResult } from "@/lib/data-sources/gnews";
 import { StatusBadge } from "@/components/status-badge";
 import { EconomicEventList } from "@/components/economic-event-list";
 import { NewsArticleList } from "@/components/news-article-list";

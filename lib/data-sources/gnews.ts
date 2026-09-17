@@ -1,9 +1,6 @@
 const SEARCH_URL = "https://gnews.io/api/v4/search";
 const REVALIDATE_SECONDS = 60 * 60;
 
-const QUERY =
-  '(geopolitics OR sanctions OR tariffs OR "trade war" OR conflict OR election OR "central bank")';
-
 export interface NewsArticle {
   title: string;
   description: string;
@@ -22,20 +19,22 @@ interface RawArticle {
   source?: { name?: string };
 }
 
-function isUsable(article: RawArticle): article is Required<Pick<RawArticle, "title" | "url">> & RawArticle {
+function isUsable(
+  article: RawArticle,
+): article is Required<Pick<RawArticle, "title" | "url">> & RawArticle {
   return typeof article.title === "string" && typeof article.url === "string";
 }
 
-export async function getGeopoliticalNews(): Promise<NewsArticle[]> {
+async function searchNews(query: string, max: number): Promise<NewsArticle[]> {
   const apiKey = process.env.NEWS_API_KEY;
   if (!apiKey) {
     throw new NewsError("Kein NEWS_API_KEY konfiguriert (siehe .env.local.example).");
   }
 
   const url = new URL(SEARCH_URL);
-  url.searchParams.set("q", QUERY);
+  url.searchParams.set("q", query);
   url.searchParams.set("lang", "en");
-  url.searchParams.set("max", "10");
+  url.searchParams.set("max", String(max));
   url.searchParams.set("sortby", "publishedAt");
   url.searchParams.set("apikey", apiKey);
 
@@ -43,9 +42,7 @@ export async function getGeopoliticalNews(): Promise<NewsArticle[]> {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new NewsError(
-      data.errors?.[0] ?? `GNews Fehler (HTTP ${response.status})`,
-    );
+    throw new NewsError(data.errors?.[0] ?? `GNews Fehler (HTTP ${response.status})`);
   }
 
   const articles: unknown = data.articles;
@@ -64,9 +61,9 @@ export async function getGeopoliticalNews(): Promise<NewsArticle[]> {
 
 export type NewsResult = { articles: NewsArticle[] } | { error: string };
 
-export async function getGeopoliticalNewsResult(): Promise<NewsResult> {
+async function searchNewsResult(query: string, max: number): Promise<NewsResult> {
   try {
-    return { articles: await getGeopoliticalNews() };
+    return { articles: await searchNews(query, max) };
   } catch (error) {
     return {
       error:
@@ -75,4 +72,19 @@ export async function getGeopoliticalNewsResult(): Promise<NewsResult> {
           : "Unerwarteter Fehler beim Abruf der News.",
     };
   }
+}
+
+const GEOPOLITICAL_QUERY =
+  '(geopolitics OR sanctions OR tariffs OR "trade war" OR conflict OR election OR "central bank")';
+
+export function getGeopoliticalNewsResult(): Promise<NewsResult> {
+  return searchNewsResult(GEOPOLITICAL_QUERY, 10);
+}
+
+export function getCompanyNewsResult(
+  symbol: string,
+  companyName: string,
+): Promise<NewsResult> {
+  const query = `"${companyName}" OR ${symbol}`;
+  return searchNewsResult(query, 5);
 }

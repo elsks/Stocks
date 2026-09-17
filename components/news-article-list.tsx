@@ -1,4 +1,4 @@
-import type { NewsArticle } from "@/lib/data-sources/geopolitical-news";
+import type { NewsArticle } from "@/lib/data-sources/gnews";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("de-DE", {
