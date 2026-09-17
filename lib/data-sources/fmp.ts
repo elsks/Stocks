@@ -246,3 +246,108 @@ export async function getCompanyFundamentalsResult(
     };
   }
 }
+
+export interface CompanyNewsArticle {
+  title: string;
+  url: string;
+  publishedDate: string;
+  site: string;
+}
+
+async function fetchFmpList(
+  path: string,
+  extraParams: Record<string, string>,
+): Promise<Record<string, unknown>[]> {
+  const url = new URL(`${BASE_URL}/${path}`);
+  for (const [key, value] of Object.entries(extraParams)) {
+    url.searchParams.set(key, value);
+  }
+  url.searchParams.set("apikey", apiKey());
+
+  const response = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new FundamentalsError(
+      typeof data?.["Error Message"] === "string"
+        ? data["Error Message"]
+        : `Financial Modeling Prep Fehler (HTTP ${response.status})`,
+    );
+  }
+
+  return Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
+}
+
+export async function getCompanyNews(symbol: string): Promise<CompanyNewsArticle[]> {
+  const raw = await fetchFmpList("stock-news", { symbols: symbol, limit: "5" });
+
+  return raw
+    .filter(
+      (item): item is Record<string, unknown> =>
+        typeof item.title === "string" && typeof item.url === "string",
+    )
+    .map((item) => ({
+      title: item.title as string,
+      url: item.url as string,
+      publishedDate:
+        typeof item.publishedDate === "string" ? item.publishedDate : "",
+      site: typeof item.site === "string" ? item.site : "Financial Modeling Prep",
+    }));
+}
+
+export type CompanyNewsResult =
+  | { articles: CompanyNewsArticle[] }
+  | { error: string };
+
+export async function getCompanyNewsResult(
+  symbol: string,
+): Promise<CompanyNewsResult> {
+  try {
+    return { articles: await getCompanyNews(symbol) };
+  } catch (error) {
+    return {
+      error:
+        error instanceof FundamentalsError
+          ? error.message
+          : "Unerwarteter Fehler beim Abruf der Unternehmens-News.",
+    };
+  }
+}
+
+export interface PriceTargetConsensus {
+  targetHigh: number | null;
+  targetLow: number | null;
+  targetConsensus: number | null;
+  targetMedian: number | null;
+}
+
+export async function getPriceTargetConsensus(
+  symbol: string,
+): Promise<PriceTargetConsensus> {
+  const raw = await fetchFmp("price-target-consensus", symbol);
+  return {
+    targetHigh: pickNumber(raw, ["targetHigh"]),
+    targetLow: pickNumber(raw, ["targetLow"]),
+    targetConsensus: pickNumber(raw, ["targetConsensus"]),
+    targetMedian: pickNumber(raw, ["targetMedian"]),
+  };
+}
+
+export type PriceTargetResult =
+  | { target: PriceTargetConsensus }
+  | { error: string };
+
+export async function getPriceTargetResult(
+  symbol: string,
+): Promise<PriceTargetResult> {
+  try {
+    return { target: await getPriceTargetConsensus(symbol) };
+  } catch (error) {
+    return {
+      error:
+        error instanceof FundamentalsError
+          ? error.message
+          : "Unerwarteter Fehler beim Abruf der Analysten-Kursziele.",
+    };
+  }
+}

@@ -28,7 +28,7 @@ export const navSections: NavSection[] = [
     label: "Unternehmensanalyse",
     summary: "Fundamentaldaten und Geschäftsmodell je Unternehmen.",
     status: "live",
-    note: "Zeigt Kennzahlen gegen deine eigenen Zielwerte für ein Beispielunternehmen.",
+    note: "Kennzahlen, Analysten-Kursziele und News für deine ganze Watchlist.",
   },
   {
     href: "/technische-analyse",
