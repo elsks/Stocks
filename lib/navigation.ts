@@ -40,9 +40,9 @@ export const navSections: NavSection[] = [
   {
     href: "/chancen-risiken",
     label: "Chancen & Risiken",
-    summary: "Strukturierte Darstellung von Chancen, Risiken und Unsicherheiten.",
-    status: "planned",
-    note: "Baut auf Fundamental- und technischer Analyse auf, folgt später.",
+    summary: "Ranking deiner Watchlist plus KI-Einschätzung je Aktie.",
+    status: "live",
+    note: "Regelbasiertes Ranking + KI-Analyse (Chancen/Risiken/Unsicherheiten), alle paar Stunden aktualisiert.",
   },
   {
     href: "/regeln",
