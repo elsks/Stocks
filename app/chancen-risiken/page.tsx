@@ -1,8 +1,7 @@
 import { navSections } from "@/lib/navigation";
 import { STOCK_WATCHLIST } from "@/lib/watchlists";
 import { getQuotesResult } from "@/lib/data-sources/twelve-data";
-import { getCompanyFundamentalsResult, getPriceTargetResult } from "@/lib/data-sources/fmp";
-import { evaluateCriteria } from "@/lib/analysis/valuation-criteria";
+import { getPriceTargetResult } from "@/lib/data-sources/fmp";
 import { rankStocks } from "@/lib/analysis/ranking";
 import { getStockOpportunityResult } from "@/lib/ai/stock-opportunity";
 import { StatusBadge } from "@/components/status-badge";
@@ -13,25 +12,22 @@ import { DataError } from "@/components/data-error";
 export default async function ChancenRisikenPage() {
   const section = navSections.find((s) => s.href === "/chancen-risiken")!;
 
-  const quotes = await getQuotesResult(STOCK_WATCHLIST);
-  const [fundamentalsResults, priceTargetResults, opportunityResults] = await Promise.all([
-    Promise.all(STOCK_WATCHLIST.map((s) => getCompanyFundamentalsResult(s))),
+  const [quotes, priceTargetResults, opportunityResults] = await Promise.all([
+    getQuotesResult(STOCK_WATCHLIST),
     Promise.all(STOCK_WATCHLIST.map((s) => getPriceTargetResult(s))),
     Promise.all(STOCK_WATCHLIST.map((s) => getStockOpportunityResult(s))),
   ]);
 
   const rankingEntries = STOCK_WATCHLIST.map((symbol, i) => {
-    const fundamentals = fundamentalsResults[i];
+    const opportunity = opportunityResults[i];
     const priceTarget = priceTargetResults[i];
     const quote = quotes.find((q) => q.symbol === symbol)?.result;
 
     return {
       symbol,
-      name: "fundamentals" in fundamentals ? fundamentals.fundamentals.profile.name : symbol,
-      criteriaResults:
-        "fundamentals" in fundamentals
-          ? evaluateCriteria(fundamentals.fundamentals.metrics)
-          : [],
+      name: "data" in opportunity ? opportunity.data.name : symbol,
+      criteriaMet: "data" in opportunity ? opportunity.data.criteriaMet : 0,
+      criteriaEvaluable: "data" in opportunity ? opportunity.data.criteriaEvaluable : 0,
       currentPrice: quote && "quote" in quote ? quote.quote.price : null,
       targetConsensus: "target" in priceTarget ? priceTarget.target.targetConsensus : null,
     };
@@ -69,19 +65,17 @@ export default async function ChancenRisikenPage() {
             siehst.
           </p>
         </div>
-        {ranked.map((stock) => {
-          const result = opportunityResults[STOCK_WATCHLIST.indexOf(stock.symbol)];
-          return "analysis" in result ? (
+        {STOCK_WATCHLIST.map((symbol) => {
+          const result = opportunityResults[STOCK_WATCHLIST.indexOf(symbol)];
+          return "data" in result ? (
             <OpportunityAnalysisCard
-              key={stock.symbol}
-              title={`${stock.name} (${stock.symbol})`}
-              analysis={result.analysis}
+              key={symbol}
+              title={`${result.data.name} (${symbol})`}
+              analysis={result.data.analysis}
             />
           ) : (
-            <div key={stock.symbol} className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">
-                {stock.name} ({stock.symbol})
-              </h3>
+            <div key={symbol} className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium">{symbol}</h3>
               <DataError message={result.error} />
             </div>
           );

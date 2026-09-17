@@ -11,7 +11,15 @@ import {
 
 const REVALIDATE_SECONDS = 4 * 60 * 60;
 
-async function buildStockAnalysis(symbol: string): Promise<OpportunityAnalysis> {
+export interface StockOpportunityData {
+  name: string;
+  sector: string | null;
+  criteriaMet: number;
+  criteriaEvaluable: number;
+  analysis: OpportunityAnalysis;
+}
+
+async function buildStockAnalysis(symbol: string): Promise<StockOpportunityData> {
   const fundamentals = await getCompanyFundamentals(symbol);
   const criteriaResults = evaluateCriteria(fundamentals.metrics);
   const met = criteriaResults.filter((r) => r.status === "met").length;
@@ -67,7 +75,15 @@ Aktuelle geopolitische Lage (marktrelevant):
 ${geoLines}
 `.trim();
 
-  return generateOpportunityAnalysis(fundamentals.profile.name, contextText);
+  const analysis = await generateOpportunityAnalysis(fundamentals.profile.name, contextText);
+
+  return {
+    name: fundamentals.profile.name,
+    sector: fundamentals.profile.sector,
+    criteriaMet: met,
+    criteriaEvaluable: evaluable,
+    analysis,
+  };
 }
 
 const cachedBuildStockAnalysis = unstable_cache(
@@ -77,14 +93,14 @@ const cachedBuildStockAnalysis = unstable_cache(
 );
 
 export type StockOpportunityResult =
-  | { analysis: OpportunityAnalysis }
+  | { data: StockOpportunityData }
   | { error: string };
 
 export async function getStockOpportunityResult(
   symbol: string,
 ): Promise<StockOpportunityResult> {
   try {
-    return { analysis: await cachedBuildStockAnalysis(symbol) };
+    return { data: await cachedBuildStockAnalysis(symbol) };
   } catch (error) {
     return {
       error:
