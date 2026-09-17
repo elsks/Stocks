@@ -279,7 +279,7 @@ async function fetchFmpList(
 }
 
 export async function getCompanyNews(symbol: string): Promise<CompanyNewsArticle[]> {
-  const raw = await fetchFmpList("stock-news", { symbols: symbol, limit: "5" });
+  const raw = await fetchFmpList("news/stock", { symbols: symbol, limit: "5" });
 
   return raw
     .filter(
