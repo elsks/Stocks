@@ -6,7 +6,7 @@ import {
   generateOpportunityAnalysis,
   AiError,
   type OpportunityAnalysis,
-} from "@/lib/ai/claude";
+} from "@/lib/ai/gemini";
 
 const REVALIDATE_SECONDS = 6 * 60 * 60;
 

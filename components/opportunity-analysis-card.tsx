@@ -1,4 +1,4 @@
-import type { OpportunityAnalysis } from "@/lib/ai/claude";
+import type { OpportunityAnalysis } from "@/lib/ai/gemini";
 
 function formatTimestamp(iso: string) {
   return new Date(iso).toLocaleString("de-DE", {
