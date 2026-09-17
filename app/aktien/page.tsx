@@ -16,8 +16,11 @@ export default async function AktienPage() {
         </h1>
         <StatusBadge status={section.status} />
       </div>
-      <p className="text-muted-foreground">Deine Watchlist.</p>
-      <Watchlist entries={entries} />
+      <p className="text-muted-foreground">
+        Deine Watchlist. Für Kennzahlen, Kursziele und News auf eine Aktie
+        klicken.
+      </p>
+      <Watchlist entries={entries} linkBase="/aktien" />
     </div>
   );
 }

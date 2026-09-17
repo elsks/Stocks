@@ -12,9 +12,9 @@ export const navSections: NavSection[] = [
   {
     href: "/aktien",
     label: "Aktien",
-    summary: "Watchlist und Kurse einzelner Unternehmen.",
+    summary: "Watchlist, Kennzahlen, Kursziele und News je Aktie.",
     status: "live",
-    note: "Deine echte Watchlist mit mehreren Aktien.",
+    note: "Auf eine Aktie klicken für Kurs, Fundamentaldaten, Kursziele und News auf einen Blick.",
   },
   {
     href: "/rohstoffe",
@@ -22,13 +22,6 @@ export const navSections: NavSection[] = [
     summary: "Kurse für Gold, Silber und weitere Rohstoffe.",
     status: "live",
     note: "Gold, Rohöl (WTI) und Silber.",
-  },
-  {
-    href: "/unternehmen",
-    label: "Unternehmensanalyse",
-    summary: "Fundamentaldaten und Geschäftsmodell je Unternehmen.",
-    status: "live",
-    note: "Kennzahlen, Analysten-Kursziele und News für deine ganze Watchlist.",
   },
   {
     href: "/technische-analyse",
